@@ -19,7 +19,24 @@ require('mason-lspconfig').setup({
     lua_ls = function()
       -- (Optional) configure lua language server
       local lua_opts = lsp_zero.nvim_lua_ls()
-      require('lspconfig').lua_ls.setup(lua_opts)
+      local lspconfig = require('lspconfig')
+      local on_attach = require("plugins.configs.lspconfig").on_attach
+      local capabilities = require("plugins.configs.lspconfig").capabilities
+      local util = require "lspconfig/util"
+      lspconfig.lua_ls.setup(lua_opts)
+      lspconfig.rust_analyzer.setup({
+	  on_attach = on_attach,
+	  capabilities = capabilities,
+	  filetypes = {"rust"},
+	  root_dir = util.root_pattern("Cargo.toml"),
+	  settings = {
+	    ['rust_analyzer'] = {
+	      cargo = {
+		allFeatures = true,
+	      },
+	    },
+	  },
+	})
     end,
   }
 })

@@ -71,7 +71,14 @@ require('lazy').setup({
     ft = { "markdown" },
     build = function() vim.fn["mkdp#util#install"]() end,
   },
-  {'Exafunction/codeium.vim'}
+  {
+    'Exafunction/codeium.vim',
+    config = function()
+      vim.g.codeium_filetypes = {
+	rust = false
+      }
+    end
+  },
 })
 
 -- Set colorscheme
