@@ -18,7 +18,19 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  {'folke/tokyonight.nvim'},
+  {
+    'folke/tokyonight.nvim',
+    lazy = false,
+    priority = 1000,
+    opts = {
+      style = "night",
+      transparent = true,
+      styles = {
+        sidebars = "transparent",
+	floats = "transparent",
+      },
+    },
+  },
   {'williamboman/mason.nvim'},
   {'williamboman/mason-lspconfig.nvim'},
   {
@@ -59,6 +71,7 @@ require('lazy').setup({
     ft = { "markdown" },
     build = function() vim.fn["mkdp#util#install"]() end,
   },
+  {'Exafunction/codeium.vim'}
 })
 
 -- Set colorscheme
