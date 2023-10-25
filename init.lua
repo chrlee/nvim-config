@@ -1,4 +1,5 @@
 require('plugins') 
+require('vim')
 
 ---
 -- LSP setup
