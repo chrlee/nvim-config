@@ -1,21 +1,21 @@
-local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
-local uv = vim.uv or vim.loop
-
--- Auto-install lazy.nvim if not present
-if not uv.fs_stat(lazypath) then
-  print('Installing lazy.nvim....')
-  vim.fn.system({
-    'git',
-    'clone',
-    '--filter=blob:none',
-    'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
-    lazypath,
-  })
-  print('Done.')
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
 end
-
 vim.opt.rtp:prepend(lazypath)
+
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
 
 require('lazy').setup({
   {
@@ -27,43 +27,23 @@ require('lazy').setup({
       transparent = true,
       styles = {
         sidebars = "transparent",
-	floats = "transparent",
+        floats = "transparent",
       },
     },
   },
-  {'williamboman/mason.nvim'},
-  {'williamboman/mason-lspconfig.nvim'},
   {
-    'VonHeikemen/lsp-zero.nvim',
-    branch = 'v3.x',
-    lazy = true,
-    config = false,
+    "mason-org/mason.nvim",
+    opts = {}
   },
-  -- LSP Support
   {
-    'neovim/nvim-lspconfig',
-    dependencies = {
-      {'hrsh7th/cmp-nvim-lsp'},
-    }
-  },
-  -- Autocompletion
-  {
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      {'L3MON4D3/LuaSnip'}
+    "mason-org/mason-lspconfig.nvim",
+    opts = {
+      automatic_installation = true,
     },
-  },
-  {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    config = function()
-      local configs = require 'nvim-treesitter.configs'
-      configs.setup {
-        highlight = {
-          enable = true
-	},
-      }
-    end,
+    dependencies = {
+      { "mason-org/mason.nvim", opts = {} },
+      "neovim/nvim-lspconfig",
+    },
   },
   {
     "iamcco/markdown-preview.nvim",
@@ -72,22 +52,23 @@ require('lazy').setup({
     build = function() vim.fn["mkdp#util#install"]() end,
   },
   {
-    'Exafunction/codeium.vim',
-    config = function()
-      vim.g.codeium_filetypes = {
-	rust = false
-      }
-    end
+    "m4xshen/hardtime.nvim",
+    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+    opts = {}
   },
   {
-   "m4xshen/hardtime.nvim",
-   dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
-   opts = {}
+    'hrsh7th/nvim-cmp',
+    dependencies = {
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-path',
+    },
+    event = "InsertEnter",
+    config = function()
+      require('config.cmp')
+    end,
   },
 })
 
--- Set colorscheme
 vim.opt.termguicolors = true
 vim.cmd.colorscheme('tokyonight')
-
-
